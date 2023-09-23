@@ -1,0 +1,27 @@
+
+---
+- name: Install Apache2 and upload MyWebsite
+  become: yes
+  hosts: all
+
+  vars: 
+    source_html_file: ./MyWebsite/index.html
+    destination: /var/www/html 
+    source_css_file: ./MyWebsite/index.css
+
+  tasks: 
+  - name: Update cache
+    apt: update_cache=yes
+
+  - name: Install apache2 webserver
+    apt: name=apache2 state=latest
+
+  - name: Copy MyWebsite html to servers
+    copy: src={{ source_html_file }} dest={{ destination }} mode=0555
+
+  - name: Copy MyWebsite css to servers
+    copy: src={{ source_css_file }} dest={{ destination }} mode=0555
+
+  - name: Enable apache2 webserver
+    service: name=apache2 enabled=yes
+
