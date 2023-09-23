@@ -11,11 +11,24 @@
     destination: /var/www/html 
 
   tasks: 
-  - name: Update cache
-    apt: update_cache=yes
+  - name: Check and print OS family
+    debug: var=ansible_pkg_mgr
 
-  - name: Install apache2 webserver
+  - name: Update cache for Debian
+    apt: update_cache=yes
+    when: ansible_pkg_mgr == "apt"
+
+  - name: Install apache2 webserver for Debian
     apt: name=apache2 state=latest
+    when: ansible_pkg_mgr == "apt"
+
+  - name: Update cache for RedHat
+    dnf: update_cache=yes
+    when: ansible_pkg_mgr == "dnf"
+
+  - name: Install apache2 webserver for RedHat
+    dnf: name=httpd state=latest
+    when: ansible_pkg_mgr == "dnf"
 
   - name: Copy MyWebsite html to servers
     copy: src={{ source_html_file }} dest={{ destination }} mode=0555
@@ -26,6 +39,10 @@
   - name: Copy Background image to servers
     copy: src={{ source_img_file }} dest={{ destination }} mode=0555
 
-  - name: Enable apache2 webserver
+  - name: Enable apache2 webserver for Debian
     service: name=apache2 enabled=yes
+    when: ansible_pkg_mgr == "apt"
 
+  - name: Enable apache2 webserver for RedHat
+    service: name=httpd enabled=yes
+    when: ansible_pkg_mgr == "dnf"
