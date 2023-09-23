@@ -6,8 +6,9 @@
 
   vars: 
     source_html_file: ./MyWebsite/index.html
+    source_css_file: ./MyWebsite/style.css
+    source_img_file: ./MyWebsite/img.jpg
     destination: /var/www/html 
-    source_css_file: ./MyWebsite/index.css
 
   tasks: 
   - name: Update cache
@@ -21,6 +22,9 @@
 
   - name: Copy MyWebsite css to servers
     copy: src={{ source_css_file }} dest={{ destination }} mode=0555
+  
+  - name: Copy Background image to servers
+    copy: src={{ source_img_file }} dest={{ destination }} mode=0555
 
   - name: Enable apache2 webserver
     service: name=apache2 enabled=yes
