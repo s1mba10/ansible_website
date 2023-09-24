@@ -5,9 +5,10 @@
   hosts: all
 
   vars: 
-    source_html_file: ./MyWebsite/index.html
-    source_css_file: ./MyWebsite/style.css
-    source_img_file: ./MyWebsite/img.jpg
+    source_folder: ./MyWebsite
+    # source_html_file: ./MyWebsite/index.html
+    # source_css_file: ./MyWebsite/style.css
+    # source_img_file: ./MyWebsite/img.jpg
     destination: /var/www/html 
 
   tasks: 
@@ -40,11 +41,10 @@
 
     when: ansible_pkg_mgr == "yum"
 
-  - name: Copy MyWebsite html to servers
-    copy: src={{ source_html_file }} dest={{ destination }} mode=0555
-
-  - name: Copy MyWebsite css to servers
-    copy: src={{ source_css_file }} dest={{ destination }} mode=0555
-  
-  - name: Copy Background image to servers
-    copy: src={{ source_img_file }} dest={{ destination }} mode=0555
+  - name: Copy website to servers
+    copy: src={{ item }} dest={{ destination }} mode=0555
+    with_fileglob: "{{source_folder}}/*.*"
+    # loop: 
+    #   - "index.html"
+    #   - "style.css"
+    #   - "img.jpg"
