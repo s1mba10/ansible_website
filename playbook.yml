@@ -14,23 +14,31 @@
   - name: Check and print package manager
     debug: var=ansible_pkg_mgr
 
+
   - block:    #======BLOCK FOR DEBIAN======
     - name: Update cache for Debian
       apt: update_cache=yes
-      when: ansible_pkg_mgr == "apt"
 
     - name: Install apache2 webserver for Debian
       apt: name=apache2 state=latest
-      when: ansible_pkg_mgr == "apt"
+    
+    - name: Enable apache2 webserver for Debian
+      service: name=apache2 state=started enabled=yes 
+
+    when: ansible_pkg_mgr == "apt"
+    
 
   - block:    #======BLOCK FOR AMAZON LINUX 2023 AMI======
     - name: Update cache for Amazon Linux 2023 AMI    
       dnf: update_cache=yes             # using dnf because of error if not
-      when: ansible_pkg_mgr == "yum"
 
     - name: Install apache2 webserver for Amazon Linux 2023 AMI
       dnf: name=httpd state=latest      # using dnf because of error if not
-      when: ansible_pkg_mgr == "yum"
+
+    - name: Enable apache2 webserver for Amazon Linux 2023 AMI
+      service: name=httpd state=started enabled=yes 
+
+    when: ansible_pkg_mgr == "yum"
 
   - name: Copy MyWebsite html to servers
     copy: src={{ source_html_file }} dest={{ destination }} mode=0555
@@ -40,11 +48,3 @@
   
   - name: Copy Background image to servers
     copy: src={{ source_img_file }} dest={{ destination }} mode=0555
-
-  - name: Enable apache2 webserver for Debian
-    service: name=apache2 state=started enabled=yes 
-    when: ansible_pkg_mgr == "apt"
-
-  - name: Enable apache2 webserver for Amazon Linux 2023 AMI
-    service: name=httpd state=started enabled=yes 
-    when: ansible_pkg_mgr == "yum"
