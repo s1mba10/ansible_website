@@ -3,5 +3,3 @@ ubuntu1 ansible_host=<server-ip>
 
 [redhat]
 redhat1 ansible_host=<server-ip>
-
-
