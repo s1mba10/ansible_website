@@ -3,48 +3,6 @@
 - name: Install Apache2 and upload MyWebsite
   become: yes
   hosts: all
-
-  vars: 
-    source_folder: ./MyWebsite
-    # source_html_file: ./MyWebsite/index.html
-    # source_css_file: ./MyWebsite/style.css
-    # source_img_file: ./MyWebsite/img.jpg
-    destination: /var/www/html 
-
-  tasks: 
-  - name: Check and print package manager
-    debug: var=ansible_pkg_mgr
-
-
-  - block:    #======BLOCK FOR DEBIAN======
-    - name: Update cache for Debian
-      apt: update_cache=yes
-
-    - name: Install apache2 webserver for Debian
-      apt: name=apache2 state=latest
-    
-    - name: Enable apache2 webserver for Debian
-      service: name=apache2 state=started enabled=yes 
-
-    when: ansible_pkg_mgr == "apt"
-    
-
-  - block:    #======BLOCK FOR AMAZON LINUX 2023 AMI======
-    - name: Update cache for Amazon Linux 2023 AMI    
-      dnf: update_cache=yes             # using dnf because of error if not
-
-    - name: Install apache2 webserver for Amazon Linux 2023 AMI
-      dnf: name=httpd state=latest      # using dnf because of error if not
-
-    - name: Enable apache2 webserver for Amazon Linux 2023 AMI
-      service: name=httpd state=started enabled=yes 
-
-    when: ansible_pkg_mgr == "yum"
-
-  - name: Copy website to servers
-    copy: src={{ item }} dest={{ destination }} mode=0555
-    with_fileglob: "{{source_folder}}/*.*"
-    # loop: 
-    #   - "index.html"
-    #   - "style.css"
-    #   - "img.jpg"
+  
+  roles: 
+    - { role: deploy-apache-server, when: ansible_system == 'Linux' }

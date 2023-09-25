@@ -1,0 +1,39 @@
+---
+# tasks file for deploy-apache-server
+- name: Check and print package manager
+  debug: var=ansible_pkg_mgr
+
+
+- block:    #======BLOCK FOR DEBIAN======
+  - name: Update cache for Debian
+    apt: update_cache=yes
+
+  - name: Install apache2 webserver for Debian
+    apt: name=apache2 state=latest
+  
+  - name: Enable apache2 webserver for Debian
+    service: name=apache2 state=started enabled=yes 
+
+  when: ansible_pkg_mgr == "apt"
+  
+
+- block:    #======BLOCK FOR AMAZON LINUX 2023 AMI======
+  - name: Update cache for Amazon Linux 2023 AMI    
+    dnf: update_cache=yes             # using dnf because of error if not
+
+  - name: Install apache2 webserver for Amazon Linux 2023 AMI
+    dnf: name=httpd state=latest      # using dnf because of error if not
+
+  - name: Enable apache2 webserver for Amazon Linux 2023 AMI
+    service: name=httpd state=started enabled=yes 
+
+  when: ansible_pkg_mgr == "yum"
+
+- name: Generating index.html file
+  template: src=index.j2 dest={{ destination }}/index.html mode=0555
+
+- name: Copy website to servers
+  copy: src={{ item }} dest={{ destination }} mode=0555
+  loop: 
+    - "img.jpg"
+    - "style.css"
